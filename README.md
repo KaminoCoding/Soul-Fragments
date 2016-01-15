@@ -1,2 +1,2 @@
 # Soul-Fragments
-A mod that
+A mod that adds a fun and dark twist to regular survival minecraft.
