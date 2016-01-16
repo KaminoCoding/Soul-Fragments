@@ -1,14 +1,14 @@
 [
 {
-  "modid": "SoulFragments",
-  "name": "Soul Fragments",
-  "description": "When you die your soul fragments.",
-  "version": "0.0.1",
-  "mcversion": "1.8.9",
-  "url": "https://github.com/TheCool1James/Soul-Fragments",
+  "modid": "soulfrags",
+  "name": "Fragment Souls Mod",
+  "description": "Example placeholder mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
   "updateUrl": "",
-  "authorList": ["TheCool1James", "Blackop778"],
-  "credits": "TheCool1James and Blackop778 for making this mod",
+  "authorList": ["ExampleDude"],
+  "credits": "The Forge and FML guys, for making this example",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
