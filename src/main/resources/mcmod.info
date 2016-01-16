@@ -1,0 +1,16 @@
+[
+{
+  "modid": "SoulFragments",
+  "name": "Soul Fragments",
+  "description": "When you die your soul fragments.",
+  "version": "0.0.1",
+  "mcversion": "1.8.9",
+  "url": "https://github.com/TheCool1James/Soul-Fragments",
+  "updateUrl": "",
+  "authorList": ["TheCool1James", "Blackop778"],
+  "credits": "TheCool1James and Blackop778 for making this mod",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
