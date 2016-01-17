@@ -1,9 +1,11 @@
-
 # Created by https://www.gitignore.io/api/gradle,eclipse,intellij,windows,osx,linux
 
 ### Gradle ###
 .gradle
 build/
+run/
+gradle.properties
+gradle.propertie
 
 # Ignore Gradle GUI config
 gradle-app.setting
