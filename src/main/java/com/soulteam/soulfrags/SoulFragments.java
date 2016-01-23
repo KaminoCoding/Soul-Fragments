@@ -47,17 +47,18 @@ public class SoulFragments
 		
 		//I'll clean up the code l8tr. 4 now, just throw in recipes
 		//Sharpen swords XD I just like the idea of it. Nice easter egg to throw into the mod
+		// I'll clean up the code l8tr. 4 now, just throw in recipes
 		ItemStack wESword = new ItemStack(Items.wooden_sword);
 		wESword.addEnchantment(Enchantment.sharpness, 3);
 		GameRegistry.addShapelessRecipe(wESword, Items.flint, Items.wooden_sword);
-		
+
 		ItemStack sESword = new ItemStack(Items.stone_sword);
-		wESword.addEnchantment(Enchantment.sharpness, 2);
-		GameRegistry.addShapelessRecipe(wESword, Items.flint, Items.stone_sword);
-		
+		sESword.addEnchantment(Enchantment.sharpness, 2);
+		GameRegistry.addShapelessRecipe(sESword, Items.flint, Items.stone_sword);
+
 		ItemStack iESword = new ItemStack(Items.iron_sword);
-		wESword.addEnchantment(Enchantment.sharpness, 1);
-		GameRegistry.addShapelessRecipe(wESword, Items.flint, Items.iron_sword);
+		iESword.addEnchantment(Enchantment.sharpness, 1);
+		GameRegistry.addShapelessRecipe(iESword, Items.flint, Items.iron_sword);
 	}
 
 	@EventHandler
