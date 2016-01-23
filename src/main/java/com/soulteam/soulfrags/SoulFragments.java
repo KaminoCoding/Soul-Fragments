@@ -42,7 +42,11 @@ public class SoulFragments
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
+		//Register Events
+		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
+		
 		//I'll clean up the code l8tr. 4 now, just throw in recipes
+		//Sharpen swords XD I just like the idea of it. Nice easter egg to throw into the mod
 		ItemStack wESword = new ItemStack(Items.wooden_sword);
 		wESword.addEnchantment(Enchantment.sharpness, 3);
 		GameRegistry.addShapelessRecipe(wESword, Items.flint, Items.wooden_sword);
@@ -59,6 +63,7 @@ public class SoulFragments
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
+		//GUI overlay for soul status
 		MinecraftForge.EVENT_BUS.register(new GUIIcons(Minecraft.getMinecraft()));
 	}
 
@@ -66,6 +71,6 @@ public class SoulFragments
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent event)
 	{
-
+		
 	}
 }
