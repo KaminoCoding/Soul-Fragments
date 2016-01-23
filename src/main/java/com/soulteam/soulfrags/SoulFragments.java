@@ -42,11 +42,14 @@ public class SoulFragments
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
+<<<<<<< HEAD
 		//Register Events
 		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 		
 		//I'll clean up the code l8tr. 4 now, just throw in recipes
 		//Sharpen swords XD I just like the idea of it. Nice easter egg to throw into the mod
+=======
+>>>>>>> origin/master
 		// I'll clean up the code l8tr. 4 now, just throw in recipes
 		ItemStack wESword = new ItemStack(Items.wooden_sword);
 		wESword.addEnchantment(Enchantment.sharpness, 3);
