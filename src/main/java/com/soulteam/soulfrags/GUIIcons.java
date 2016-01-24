@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
@@ -46,6 +47,7 @@ public class GUIIcons extends Gui
 	//Draw stuff during XP render
 	public void onRenderXPBar(RenderGameOverlayEvent event)
 	{
+		EntityPlayer player = mc.thePlayer;
 		if(event.isCancelable()||event.type != ElementType.EXPERIENCE)
 			return;
 		int scale = mc.gameSettings.guiScale; //Get the scale settings, 1 = Smallest, 4 = Largest, 2 to 3 = everything else

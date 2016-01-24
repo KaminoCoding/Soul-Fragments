@@ -3,10 +3,13 @@ package com.soulteam.soulfrags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.soulteam.soulfrags.playerdata.PlayerEventHandler;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.gen.structure.StructureVillagePieces.Well;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -15,11 +18,16 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = SoulFragments.MODID, name = SoulFragments.MODNAME, version = SoulFragments.MODVER)
 public class SoulFragments
 {
+	//public static SimpleNetworkWrapper net_wrapper;
+	
 	public static final String MODID = "SoulFragments";
 	public static final String MODNAME = "Soul Fragments";
 	public static final String MODVER = "0.0.1";
@@ -27,7 +35,7 @@ public class SoulFragments
 
 	public SoulFragments()
 	{
-
+		
 	}
 
 	@Instance(value = SoulFragments.MODID)
@@ -36,20 +44,17 @@ public class SoulFragments
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-
+		
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-<<<<<<< HEAD
 		//Register Events
 		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 		
 		//I'll clean up the code l8tr. 4 now, just throw in recipes
 		//Sharpen swords XD I just like the idea of it. Nice easter egg to throw into the mod
-=======
->>>>>>> origin/master
 		// I'll clean up the code l8tr. 4 now, just throw in recipes
 		ItemStack wESword = new ItemStack(Items.wooden_sword);
 		wESword.addEnchantment(Enchantment.sharpness, 3);
