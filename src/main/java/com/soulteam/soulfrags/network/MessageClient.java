@@ -1,8 +1,11 @@
 package com.soulteam.soulfrags.network;
 
 import com.soulteam.soulfrags.SoulFragments;
+import com.soulteam.soulfrags.playerdata.ExtendedPlayer;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -11,9 +14,13 @@ public class MessageClient implements IMessage
 	//Variable
 	private boolean isMsgValid;
 	private int soulAmount;
+	private NBTTagCompound tag;
 	
-	public MessageClient()
+	public MessageClient() { }
+	
+	public MessageClient(EntityPlayer player)
 	{
+		ExtendedPlayer.get(player).saveNBTData(tag);
 		isMsgValid = true; //called correct thing
 	}
 	
@@ -27,14 +34,19 @@ public class MessageClient implements IMessage
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		//TODO: Add NBT tag class
+		tag = ByteBufUtils.readTag(buf); //read to nbt
 	}
 	
 	//Called when the packet manager sends a packet
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		//TODO: Add NBT class
+		ByteBufUtils.writeTag(buf, tag); //write to nbt
 		
+	}
+	
+	public void process(EntityPlayer player)
+	{
+		ExtendedPlayer.get(player).loadNBTData(tag); //load?
 	}
 }

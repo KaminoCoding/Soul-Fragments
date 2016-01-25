@@ -21,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 
+import com.soulteam.soulfrags.playerdata.ExtendedPlayer;
+
 @SideOnly(Side.CLIENT)
 public class GUIIcons extends Gui
 {
@@ -47,7 +49,8 @@ public class GUIIcons extends Gui
 	//Draw stuff during XP render
 	public void onRenderXPBar(RenderGameOverlayEvent event)
 	{
-		EntityPlayer player = mc.thePlayer;
+		//EntityPlayer player = mc.thePlayer;
+		ExtendedPlayer extPlyr = ExtendedPlayer.get(this.mc.thePlayer);
 		if(event.isCancelable()||event.type != ElementType.EXPERIENCE)
 			return;
 		int scale = mc.gameSettings.guiScale; //Get the scale settings, 1 = Smallest, 4 = Largest, 2 to 3 = everything else
@@ -61,7 +64,7 @@ public class GUIIcons extends Gui
 		//Draw the texture.
 		this.drawTexturedModalRect(xPos, yPos, STATS_ICON_BASE_U, STATS_ICON_BASE_V, STATS_ICON_SIZE, STATS_ICON_SIZE);
 		this.drawTexturedModalRect(xPos, yPos + STATS_ICON_SIZE + 5, STATS_ICON_BASE_U + 32, STATS_ICON_BASE_V, STATS_ICON_SIZE, STATS_ICON_SIZE);
-		this.mc.fontRendererObj.drawString("100", xPos + 28, yPos + 28, 0);
+		this.mc.fontRendererObj.drawString(extPlyr.getSoul() + "", xPos + 28, yPos + 28, 0);
 		this.mc.fontRendererObj.drawString("0", xPos + 28, yPos + STATS_ICON_SIZE + 33, 0);
 	}
 }

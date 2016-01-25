@@ -38,7 +38,7 @@ public class MessageHandlerClient implements IMessageHandler<MessageClient, IMes
 			@Override
 			public void run()
 			{
-				
+				//TODO: Do stuff here
 			}
 		});
 		
