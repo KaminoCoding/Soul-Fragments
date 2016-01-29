@@ -4,13 +4,12 @@ import com.soulteam.soulfrags.SoulFragments;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class SoulEssence extends Item
+public class SoulShard extends Item
 {
-	private final String itemName = "SoulEssence";
-	public SoulEssence()
+	private final String itemName = "SoulShard";
+	public SoulShard()
 	{
 		GameRegistry.registerItem(this, itemName);
 		setUnlocalizedName(SoulFragments.MODID + "_" + itemName);

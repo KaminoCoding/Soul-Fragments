@@ -3,12 +3,18 @@ package com.soulteam.soulfrags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.soulteam.soulfrags.items.RegisterItems;
+import com.soulteam.soulfrags.items.SoulEssence;
 import com.soulteam.soulfrags.playerdata.PlayerEventHandler;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.structure.StructureVillagePieces.Well;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -26,7 +32,7 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(modid = SoulFragments.MODID, name = SoulFragments.MODNAME, version = SoulFragments.MODVER)
 public class SoulFragments
 {
-	//public static SimpleNetworkWrapper net_wrapper;
+	//public static SimpleNetworkWrapper net_wrapper; packet use is now disabled
 	
 	public static final String MODID = "SoulFragments";
 	public static final String MODNAME = "Soul Fragments";
@@ -51,22 +57,16 @@ public class SoulFragments
 	public void init(FMLInitializationEvent event)
 	{
 		//Register Events
-		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
+		//MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 		
-		//I'll clean up the code l8tr. 4 now, just throw in recipes
-		//Sharpen swords XD I just like the idea of it. Nice easter egg to throw into the mod
-		// I'll clean up the code l8tr. 4 now, just throw in recipes
-		ItemStack wESword = new ItemStack(Items.wooden_sword);
-		wESword.addEnchantment(Enchantment.sharpness, 3);
-		GameRegistry.addShapelessRecipe(wESword, Items.flint, Items.wooden_sword);
-
-		ItemStack sESword = new ItemStack(Items.stone_sword);
-		sESword.addEnchantment(Enchantment.sharpness, 2);
-		GameRegistry.addShapelessRecipe(sESword, Items.flint, Items.stone_sword);
-
-		ItemStack iESword = new ItemStack(Items.iron_sword);
-		iESword.addEnchantment(Enchantment.sharpness, 1);
-		GameRegistry.addShapelessRecipe(iESword, Items.flint, Items.iron_sword);
+		//register items
+		RegisterItems regI = new RegisterItems();
+		regI.registerItems(event, MODID);
+		
+		//register blocks
+		
+		//register recipes
+		regI.registerRecipes();
 	}
 
 	@EventHandler
