@@ -11,7 +11,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 	public final static String EXT_ID = "Soulfrags_S"; //The ID of the unique name
 	private final EntityPlayer player; //entity player
 	private int soulAmount, regen; //values to store
-	private int DATA_ID = 3;
+	private int DATA_ID = 22;
 	
 	public ExtendedPlayer(EntityPlayer player)
 	{
@@ -66,5 +66,20 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 	{
 		return player.getDataWatcher().getWatchableObjectInt(DATA_ID);
 	}
-
+	
+	public void addSoul(int number, boolean isAdd)
+	{
+		//Failsafe mechanism to ensure the soul amount does not
+		//surpass 100 or drop below 0. In other words, the soul amound
+		//stays between (and including 100 and 0) 100 and 0
+		if(soulAmount >= number && !isAdd)
+			soulAmount = soulAmount - number;
+		else if(soulAmount + number <= 100 && isAdd)
+			soulAmount = soulAmount + number;
+		else if(soulAmount < number && !isAdd)
+			soulAmount = 0;
+		else if(soulAmount + number > 100 && isAdd)
+			soulAmount = 100;
+		player.getDataWatcher().updateObject(DATA_ID, soulAmount); //update value
+	}
 }

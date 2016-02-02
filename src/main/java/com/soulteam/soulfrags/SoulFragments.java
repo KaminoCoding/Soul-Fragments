@@ -3,8 +3,7 @@ package com.soulteam.soulfrags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.soulteam.soulfrags.items.RegisterItems;
-import com.soulteam.soulfrags.items.SoulEssence;
+import com.soulteam.soulfrags.items.*;
 import com.soulteam.soulfrags.playerdata.PlayerEventHandler;
 
 import net.minecraft.client.Minecraft;
@@ -57,13 +56,11 @@ public class SoulFragments
 	public void init(FMLInitializationEvent event)
 	{
 		//Register Events
-		//MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
+		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 		
 		//register items
-		RegisterItems regI = new RegisterItems();
+		SoulItems regI = new SoulItems();
 		regI.registerItems(event, MODID);
-		
-		//register blocks
 		
 		//register recipes
 		regI.registerRecipes();

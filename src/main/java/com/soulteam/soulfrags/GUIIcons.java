@@ -47,7 +47,7 @@ public class GUIIcons extends Gui
 	
 	@SubscribeEvent (priority = EventPriority.NORMAL)
 	//Draw stuff during XP render
-	public void onRenderXPBar(RenderGameOverlayEvent event)
+	public void onRenderXPBar(RenderGameOverlayEvent.Post event)
 	{
 		//EntityPlayer player = mc.thePlayer;
 		ExtendedPlayer extPlyr = ExtendedPlayer.get(this.mc.thePlayer);
@@ -64,8 +64,9 @@ public class GUIIcons extends Gui
 		//Draw the texture.
 		this.drawTexturedModalRect(xPos, yPos, STATS_ICON_BASE_U, STATS_ICON_BASE_V, STATS_ICON_SIZE, STATS_ICON_SIZE);
 		this.drawTexturedModalRect(xPos, yPos + STATS_ICON_SIZE + 5, STATS_ICON_BASE_U + 32, STATS_ICON_BASE_V, STATS_ICON_SIZE, STATS_ICON_SIZE);
-		//this.mc.fontRendererObj.drawString(extPlyr.getSoul() + "", xPos + 28, yPos + 28, 0);
-		this.mc.fontRendererObj.drawString("0", xPos + 28, yPos + STATS_ICON_SIZE + 33, 0xFFFFFF);
-		this.mc.fontRendererObj.drawString("100", xPos + 28, yPos + 28, 0xFFFFFF);
+		String soul = extPlyr.getSoul() + "";
+		this.mc.fontRendererObj.drawString(soul, xPos + 28, yPos + 28, 0xFFFFFF); //regeneration energy
+		//this.mc.fontRendererObj.drawString("0", xPos + 28, yPos + STATS_ICON_SIZE + 33, 0xFFFFFF);
+		this.mc.fontRendererObj.drawString("0", xPos + 28, yPos + STATS_ICON_SIZE + 33, 0xFFFFFF); //soul
 	}
 }

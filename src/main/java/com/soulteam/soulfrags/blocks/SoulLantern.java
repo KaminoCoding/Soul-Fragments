@@ -15,13 +15,14 @@ public class SoulLantern extends Block
 	private final String name = "SoulLantern";
 	public SoulLantern()
 	{
-		super(Material.redstoneLight);
+		super(Material.glass);
 		GameRegistry.registerBlock(this, name);
 		setUnlocalizedName(SoulFragments.MODID + "_" + name);
 		setCreativeTab(CreativeTabs.tabMisc);
 		setLightLevel(1.0F);
-		setResistance(98.56F);
+		setResistance(50.3F);
 		setHardness(3.6F);
+		setHarvestLevel("pickaxe", 2);
 	}
 	
 	public String getName()
