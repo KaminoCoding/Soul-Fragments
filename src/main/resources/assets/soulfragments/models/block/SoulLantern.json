@@ -1,6 +1,13 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "soulfragments:blocks/SoulLantern"
+    "parent": "block/cube",
+    "textures":
+    {
+        "up": "soulfragments:blocks/SoulLantern_Top",
+        "down": "soulfragments:blocks/SoulLantern_Top",
+        "north": "soulfragments:blocks/SoulLantern",
+        "south": "soulfragments:blocks/SoulLantern_South",
+        "east": "soulfragments:blocks/SoulLantern_Top",
+        "west": "soulfragments:blocks/SoulLantern_Top",
+        "particle": "soulfragments:blocks/SoulLantern_Top"
     }
 }

@@ -1,5 +1,6 @@
 package com.soulteam.soulfrags.items;
 
+import com.soulteam.soulfrags.CustomDrink;
 import com.soulteam.soulfrags.blocks.*;
 
 import net.minecraft.block.Block;
@@ -23,7 +24,7 @@ public class SoulItems
 	public static Item coldbottle;
 	
 	//foods
-	public static ItemFood rawsoul;
+	public static CustomDrink rawsoul;
 	
 	//blocks
 	public static Block soullantern;

@@ -1,4 +1,4 @@
-package com.soulteam.soulfrags;
+package com.soulteam.soulfrags.GUI;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -1,2 +1,6 @@
 item.SoulFragments_SoulEssence.name=Soul Essence
 item.SoulFragments_SoulShard.name=Soul Shard
+item.SoulFragments_ColdBottle.name=Cold Bottle
+item.SoulFragments_RawSoul.name=Raw Soul Bottle
+
+tile.SoulFragments_SoulLantern.name=Soul Lantern

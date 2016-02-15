@@ -72,13 +72,13 @@ public class ExtendedPlayer implements IExtendedEntityProperties
 		//Failsafe mechanism to ensure the soul amount does not
 		//surpass 100 or drop below 0. In other words, the soul amound
 		//stays between (and including 100 and 0) 100 and 0
-		if(soulAmount >= number && !isAdd)
+		if(soulAmount >= number && isAdd == false)
 			soulAmount = soulAmount - number;
-		else if(soulAmount + number <= 100 && isAdd)
+		else if(soulAmount + number <= 100 && isAdd == true)
 			soulAmount = soulAmount + number;
-		else if(soulAmount < number && !isAdd)
+		else if(soulAmount < number && isAdd == false)
 			soulAmount = 0;
-		else if(soulAmount + number > 100 && isAdd)
+		else if(soulAmount + number > 100 && isAdd == true)
 			soulAmount = 100;
 		player.getDataWatcher().updateObject(DATA_ID, soulAmount); //update value
 	}

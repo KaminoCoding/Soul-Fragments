@@ -3,6 +3,7 @@ package com.soulteam.soulfrags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.soulteam.soulfrags.GUI.GUIIcons;
 import com.soulteam.soulfrags.items.*;
 import com.soulteam.soulfrags.playerdata.PlayerEventHandler;
 
