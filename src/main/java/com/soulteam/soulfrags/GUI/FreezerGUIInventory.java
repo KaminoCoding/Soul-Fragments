@@ -5,13 +5,19 @@ import com.soulteam.soulfrags.blocks.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class FreezerGUIInventory extends Container
 {
 	//Store tile entity for use :)
 	private TileEntityFreezer tilefreezer;
+	
+	private int[] cachedFields;
 	
 	/* We need to store each slot *index* used by this GUI
 	We have the player inventory slots beneath the freezer slots
@@ -26,7 +32,7 @@ public class FreezerGUIInventory extends Container
 	private final int INV_COLUMN_COUNT = 9;
 	private final int INV_COUNT = INV_ROW_COUNT * INV_COLUMN_COUNT;
 	
-	private final int INPUT_INDEX = INV_COUNT + HOTBAR_COUNT + 1; //36
+	private final int INPUT_INDEX = INV_COUNT + HOTBAR_COUNT; //36
 	private final int FUEL_INDEX = INPUT_INDEX + 1; //37
 	private final int FREEZER_INDEX = FUEL_INDEX + 1; //38
 	private final int OUTPUT_INDEX = FREEZER_INDEX + 1; //39
@@ -42,11 +48,11 @@ public class FreezerGUIInventory extends Container
 	{
 		this.tilefreezer = tileEntityFreezer;
 		//GUI scale is 176x166 (length, width)
-		final int SLOT_HOTBAR_X = 7;
-		final int SLOT_HOTBAR_Y = 141;
+		final int SLOT_HOTBAR_X = 8;
+		final int SLOT_HOTBAR_Y = 142;
 		
-		final int SLOT_INVENT_X = 7;
-		final int SLOT_INVENT_Y = 83;
+		final int SLOT_INVENT_X = 8;
+		final int SLOT_INVENT_Y = 84;
 		//Now fill in the slots for the hotbar
 		for(int i = 0; i < HOTBAR_COUNT; i++)
 		{
@@ -55,11 +61,11 @@ public class FreezerGUIInventory extends Container
 		}
 		
 		//Now fill in the inventory slots
-		for(int y = 0; y < INV_COLUMN_COUNT; y++)
+		for(int y = 0; y < INV_ROW_COUNT; y++)
 		{
-			for(int x = 0; x < INV_ROW_COUNT; x++)
+			for(int x = 0; x < INV_COLUMN_COUNT; x++)
 			{
-				int slotnumber = x + HOTBAR_COUNT + y * INV_COLUMN_COUNT;
+				int slotnumber = HOTBAR_COUNT + y * INV_COLUMN_COUNT + x;
 				int xpos = SLOT_INVENT_X + x * 18;
 				int ypos = SLOT_INVENT_Y + y * 18;
 				addSlotToContainer(new Slot(invPlayer, slotnumber, xpos, ypos));
@@ -68,10 +74,10 @@ public class FreezerGUIInventory extends Container
 		
 		// Now add the fuel, i/o and freezer slots
 		// Coordinates retrieved from GIMP :p
-		addSlotToContainer(new Slot(invPlayer, INPUT_INDEX, 25, 22));
-		addSlotToContainer(new Slot(invPlayer, FUEL_INDEX, 25, 58));
-		addSlotToContainer(new Slot(invPlayer, FREEZER_INDEX, 79, 58));
-		addSlotToContainer(new Slot(invPlayer, OUTPUT_INDEX, 133, 40));
+		addSlotToContainer(new FreezableInput(tilefreezer, INPUT_NUMBER, 26, 23));
+		addSlotToContainer(new SlotFuel(tilefreezer, FUEL_NUMBER, 26, 59));
+		addSlotToContainer(new SlotFreezer(tilefreezer, FREEZER_NUMBER, 80, 59));
+		addSlotToContainer(new SlotOutput(tilefreezer, OUTPUT_NUMBER, 134, 41));
 	}
 	
 	/** If player is still using the thing. Otherwise, close the GUI. **/
@@ -136,6 +142,12 @@ public class FreezerGUIInventory extends Container
 			System.err.print("Invalid slotIndex:" + sourceSlotIndex);
 			return null;
 		}
+		// If stack size == 0 (the entire stack was moved) set slot contents to null
+		if (sourceStack.stackSize == 0)
+			sourceSlot.putStack(null);
+		else
+			sourceSlot.onSlotChanged();
+		
 		//When everything passes the conditions, pickup the stack
 		//And return the copy of the source slot.
 		sourceSlot.onPickupFromSlot(player, sourceStack);
@@ -154,6 +166,90 @@ public class FreezerGUIInventory extends Container
 	@Override
 	public void detectAndSendChanges()
 	{
+		super.detectAndSendChanges();
+		boolean allFieldsHaveChanged = false;
+		boolean fieldsChanged[] = new boolean[tilefreezer.getFieldCount()];
 		
+		if(cachedFields == null)
+		{
+			cachedFields = new int[tilefreezer.getFieldCount()];
+			allFieldsHaveChanged = true;
+		}
+		for(int i = 0; i < cachedFields.length; ++i)
+		{
+			if(allFieldsHaveChanged || cachedFields[i] != tilefreezer.getField(i))
+			{
+				cachedFields[i] = tilefreezer.getField(i);
+				fieldsChanged[i] = true;
+			}
+		}
+		for(int i = 0; i < this.crafters.size(); ++i)
+		{
+			ICrafting icraft = (ICrafting) this.crafters.get(i);
+			for(int fieldID = 0; fieldID < tilefreezer.getFieldCount(); ++fieldID)
+			{
+				if(fieldsChanged[fieldID])
+					icraft.sendProgressBarUpdate(this, fieldID, cachedFields[fieldID]);
+			}
+		}
+	}
+	
+	/** Called when the progress bar updates. The two values (id, data) are the
+	 * same two values sent by the sendProgressBarUpdate. In this case, we just pass
+	 * them down to the tile entity **/
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void updateProgressBar(int id, int data)
+	{
+		tilefreezer.setField(id, data);
+	}
+	
+	public class SlotFreezer extends Slot
+	{
+		public SlotFreezer(IInventory inventoryIn, int index, int xPosition, int yPosition)
+		{   //super() stuff
+			super(inventoryIn, index, xPosition, yPosition);
+		}
+		@Override //Check if the item can go into the slot
+		public boolean isItemValid(ItemStack item)
+		{
+			return tilefreezer.isItemFuel(item);
+		}
+	}
+	
+	public class SlotFuel extends Slot
+	{
+		public SlotFuel(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+			super(inventoryIn, index, xPosition, yPosition);
+		}
+		@Override
+		public boolean isItemValid(ItemStack item)
+		{
+			return tilefreezer.isItemFuel(item);
+		}
+	}
+	
+	public class SlotOutput extends Slot
+	{
+		public SlotOutput(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+			super(inventoryIn, index, xPosition, yPosition);
+		}
+		@Override
+		public boolean isItemValid(ItemStack item)
+		{
+			return false;
+		}
+	}
+	
+	public class FreezableInput extends Slot
+	{
+		public FreezableInput(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+			super(inventoryIn, index, xPosition, yPosition);
+		}
+		@Override
+		public boolean isItemValid(ItemStack item)
+		{
+			return tilefreezer.getFreezeRecipe(item) != null;
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.soulteam.soulfrags.blocks;
 
 import com.soulteam.soulfrags.SoulFragments;
+import com.soulteam.soulfrags.GUI.FreezerGUIHandler;
 import com.soulteam.soulfrags.GUI.GuiHandler;
 
 import net.minecraft.block.BlockContainer;
@@ -15,19 +16,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Freezer extends BlockContainer
 {
 	//This is the actual block class for the freezer
 	
-	private final String name = "Freezer";
+	private final String name = "tilefreezer";
 	
-	protected Freezer()
+	public Freezer()
 	{
 		super(Material.rock);
-		GameRegistry.registerBlock(this, name);
-		setUnlocalizedName(SoulFragments.MODID + "_" + name);
 		setCreativeTab(CreativeTabs.tabMisc);
 		setLightOpacity(5);
 	}
@@ -47,7 +47,7 @@ public class Freezer extends BlockContainer
 	{
 		if(worldIn.isRemote)
 			return true;
-		playerIn.openGui(SoulFragments.instance, GuiHandler.getGuiID(), worldIn, pos.getX(), pos.getX(), pos.getZ());
+		playerIn.openGui(SoulFragments.instance, FreezerGUIHandler.getGuiID(), worldIn, pos.getX(), pos.getY(), pos.getZ());
 		return true;
 	}
 	

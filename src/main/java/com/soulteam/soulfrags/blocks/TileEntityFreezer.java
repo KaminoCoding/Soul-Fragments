@@ -27,6 +27,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBrewingStand;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.tileentity.TileEntityLockable;
@@ -38,7 +39,7 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import scala.Array;
 
-public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlayerListBox, ISidedInventory
+public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBox, ISidedInventory
 {
 	//---------------------------------------------------------------//
 	//----------------------VARIABLES--------------------------------//
@@ -59,10 +60,42 @@ public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlay
 	private int freezeTime = 0; //Current freeze time completed
 	private int COOK_TIME_COMPLETION = 200; //Freeze rate of current item
 	private int currentFuelBurnTime = 0; //How much time a fresh piece of [the] fuel will burn for
-	private int currentFuelFreezeTime = 0; //How much fast a fresh peice of [the] coolent will cool
+	private int currentFuelFreezeTime = 0; //How much fast a fresh piece of [the] coolant will cool
+	private int initialFuelFreezeTime = 0;
+	private int initialFuelBurnTime = 0;
 	//---------------------------------------------------------------//
 	
-	public boolean freezingSomething() { return freezeTime > 0; }
+	/**
+	 * Returns the fraction of freeze time until complete, i.e., 0.75 = 3/4 complete
+	 * @return a fraction (decimal form) between 1 and 0
+	 */
+	public double fractionFreezeTimeComplete()
+	{
+		double var = freezeTime / (double) COOK_TIME_COMPLETION;
+		return MathHelper.clamp_double(var, 0.0, 1.0);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double fractionFuelRemaining(boolean isCoolant)
+	{
+		if(isCoolant)
+		{
+			if(initialFuelFreezeTime == 0) return 0; //Make sure denominator is not 0
+			double var = currentFuelFreezeTime / (double) initialFuelFreezeTime;
+			return MathHelper.clamp_double(var, 0.0, 1.0);
+		}
+		else
+		{
+			if(initialFuelBurnTime == 0) return 0; //Make sure denominator is not 0
+			double var = currentFuelBurnTime / (double) initialFuelBurnTime;
+			return MathHelper.clamp_double(var, 0.0, 1.0);
+		}
+	}
+	
+	public boolean freezingSomething() { return freezeTime > 0 && freezeTime < COOK_TIME_COMPLETION; }
 	
 	public ItemStack getFreezeRecipe(ItemStack input){ return FreezerRecipes.instance().recipeReturnStack(input); }
 	
@@ -94,33 +127,45 @@ public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlay
 		return getFuelFreezeTime(input) > 0 || getFuelTime(input) > 0;
 	}
 	
+	/** Returns true if item is allowed to go into the slot **/
+	@Override
+	public boolean isItemValidForSlot(int index, ItemStack stack)
+	{
+		return index == 3 ? false : (index != 0 ? isItemFuel(stack) : getFreezeRecipe(stack) != null);
+	}
+
 	// returns the number of ticks the given item will burn. Returns 0 if the given item is not a valid fuel
 	public static short getItemBurnTime(ItemStack stack)
 	{
-		int burntime = TileEntityFurnace.getItemBurnTime(stack);  // just use the vanilla values
+		int burntime = TileEntityFurnace.getItemBurnTime(stack);  //Just use the vanilla values
 		return (short)MathHelper.clamp_int(burntime, 0, Short.MAX_VALUE);
 	}
 	
 	public boolean freezeObject(boolean doSmelt)
 	{
-		Integer outputSlot = null;
-		ItemStack output = null;
-		if(itemstacks[INPUT_SLOT] != null)
+		Integer outputSlot = null; //Set output slot id
+		ItemStack outputStack = null; //Set output item stack
+		if(itemstacks[INPUT_SLOT] != null) //Null check on input slot
 		{
-			output = getFreezeRecipe(itemstacks[INPUT_SLOT]);
-			if(output == itemstacks[OUTPUT_SLOT] || itemstacks[OUTPUT_SLOT] == null)
+			//Set the output stack as the freeze result
+			//Then check if the output slot is null or if the output stack can 
+			//be combined with the items there
+			outputStack = getFreezeRecipe(itemstacks[INPUT_SLOT]);
+			if(outputStack == itemstacks[OUTPUT_SLOT] || itemstacks[OUTPUT_SLOT] == null)
 				outputSlot = OUTPUT_SLOT;
 		}
-		if(outputSlot == null) return false;
-		if(!doSmelt) return true;
+		if(outputSlot == null) return false; //Check if the input is valid
+		if(!doSmelt) return true; //Stop at this point if smelt is disabled
 		
-		itemstacks[INPUT_SLOT].stackSize --;
-		if(itemstacks[INPUT_SLOT].stackSize <= 0)
-			itemstacks[INPUT_SLOT] = null;
-		if(itemstacks[outputSlot] == null)
-			itemstacks[outputSlot] = output.copy();
-		else
-			itemstacks[outputSlot].stackSize += output.stackSize;
+		itemstacks[INPUT_SLOT].stackSize --; //Decrease the input slot
+		
+		if(itemstacks[INPUT_SLOT].stackSize <= 0) //Check if we removed too much input
+			itemstacks[INPUT_SLOT] = null; //Empty the slot in that case
+		
+		if(itemstacks[outputSlot] == null) //Check if there's anything in the output slot
+			itemstacks[outputSlot] = outputStack.copy(); //If so, add the result in
+		else //Else, just increase the output by one
+			itemstacks[outputSlot].stackSize += outputStack.stackSize;
 		markDirty();
 		return true;
 	}
@@ -238,14 +283,6 @@ public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlay
 	{
 		Arrays.fill(itemstacks, null);
 	}
-
-	/** Open GUI? **/
-	@Override
-	public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
-	{
-		return new FreezerGUIInventory(playerInventory, this);
-	}
-	
 	
 	/** Called every tick to update the tileentity
 	* i.e. if the fuel(s) has run out etc. **/
@@ -254,40 +291,37 @@ public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlay
 	{
 		if(freezingSomething()) //if the freezer is freezing something
 		{
-			freezeTime ++; //increase the freeze time
-			currentFuelFreezeTime --; //decrease the fuel burning/freezing amount
-			currentFuelBurnTime --;
+			++freezeTime; //increase the freeze time
+			--currentFuelFreezeTime; //decrease the fuel burning/freezing amount
+			--currentFuelBurnTime;
 		}
-		//if the freezer is not freezing anything or the fuel ran out
-		if(!freezingSomething() || currentFuelFreezeTime == 0 || currentFuelBurnTime == 0)
-		{
-			//check if there are anymore fuel, if not
-			if(itemstacks[FUEL_SLOT] == null || itemstacks[FREEZER_SLOT] == null)
-			{   //un-freeze everything at double the speed
-				freezeTime = MathHelper.clamp_int(freezeTime - 2, 0, this.COOK_TIME_COMPLETION);
-			}
-			else
-			{   
-				//or else, reset the fuel times and consume one piece of fuel
-				if(currentFuelFreezeTime == 0)
-				{
-					currentFuelFreezeTime = getFuelFreezeTime(itemstacks[FREEZER_SLOT]);
-					itemstacks[FREEZER_SLOT].stackSize --;
-				}
-				if(currentFuelBurnTime == 0)
-				{
-					currentFuelBurnTime = getFuelTime(itemstacks[FUEL_SLOT]);
-					itemstacks[FUEL_SLOT].stackSize --;
-				}
-			}
+		//check if there are anymore fuel, if not
+		if(itemstacks[FUEL_SLOT] == null || itemstacks[FREEZER_SLOT] == null)
+		{   //un-freeze everything at double the speed
+			freezeTime = MathHelper.clamp_int(freezeTime - 2, 0, this.COOK_TIME_COMPLETION);
 		}
-		else
-		{
-			if(freezeTime == this.COOK_TIME_COMPLETION) //check if the item is finished freezing
+		else if(freezeObject(false))
+		{   
+			//or else, reset the fuel times and consume one piece of fuel
+			if(currentFuelFreezeTime == 0)
 			{
-				freezeTime = 0; //reset timer
-				freezeObject(true); //convert the item
+				currentFuelFreezeTime = initialFuelFreezeTime = getFuelFreezeTime(itemstacks[FREEZER_SLOT]);
+				itemstacks[FREEZER_SLOT].stackSize --;
+				if(itemstacks[INPUT_SLOT].stackSize <= 0)
+					itemstacks[INPUT_SLOT] = null;
 			}
+			if(currentFuelBurnTime == 0)
+			{
+				currentFuelBurnTime = initialFuelBurnTime = getFuelTime(itemstacks[FUEL_SLOT]);
+				itemstacks[FUEL_SLOT].stackSize --;
+				if(itemstacks[FUEL_SLOT].stackSize <= 0)
+					itemstacks[FUEL_SLOT] = null;
+			}
+		}
+		if(freezeTime == this.COOK_TIME_COMPLETION) //check if the item is finished freezing
+		{
+			freezeTime = 0; //reset timer
+			freezeObject(true); //convert the item
 		}
 	}
 	
@@ -388,19 +422,7 @@ public class TileEntityFreezer extends TileEntityLockable implements IUpdatePlay
 	@Override
 	public void closeInventory(EntityPlayer player){ }
 	
-	/** Returns true if item is allowed to go into the slot **/
-	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack)
-	{
-		return index == 3 ? false : (index != 0 ? isItemFuel(stack) : true);
-	}
 	/**--------------------------------------------------------------- **/
-
-	@Override
-	public String getGuiID()
-	{
-		return "soulfragments:freezer"; //TODO fill this in
-	}
 	
 	/** Gets the slot number for the given face. i.e. for the furnace,
 	 * a hopper going into the side (EnumFacing) fills the fuel slot (int) **/

@@ -3,11 +3,19 @@ package com.soulteam.soulfrags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import api.player.*;
+import api.player.client.ClientPlayerAPI;
+
+import com.soulteam.soulfrags.GUI.FreezerGUIHandler;
 import com.soulteam.soulfrags.GUI.GUIIcons;
+import com.soulteam.soulfrags.GUI.GuiHandler;
 import com.soulteam.soulfrags.items.*;
+import com.soulteam.soulfrags.playerdata.ClientPlayerApiBase;
 import com.soulteam.soulfrags.playerdata.PlayerEventHandler;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.enchantment.Enchantment;
@@ -38,10 +46,11 @@ public class SoulFragments
 	public static final String MODNAME = "Soul Fragments";
 	public static final String MODVER = "0.0.1";
 	public static final Logger Logger = LogManager.getLogger(MODID);
-
+	private SoulItems regI = new SoulItems();
+	
 	public SoulFragments()
 	{
-		
+		ClientPlayerAPI.register(MODID, ClientPlayerApiBase.class);
 	}
 
 	@Instance(value = SoulFragments.MODID)
@@ -50,7 +59,7 @@ public class SoulFragments
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		
+		regI.registerTiles(event, MODID);
 	}
 
 	@EventHandler
@@ -60,7 +69,6 @@ public class SoulFragments
 		MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 		
 		//register items
-		SoulItems regI = new SoulItems();
 		regI.registerItems(event, MODID);
 		
 		//register recipes

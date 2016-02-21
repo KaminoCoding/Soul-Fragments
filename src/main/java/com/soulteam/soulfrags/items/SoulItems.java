@@ -1,9 +1,13 @@
 package com.soulteam.soulfrags.items;
 
 import com.soulteam.soulfrags.CustomDrink;
+import com.soulteam.soulfrags.SoulFragments;
+import com.soulteam.soulfrags.GUI.FreezerGUIHandler;
+import com.soulteam.soulfrags.GUI.GuiHandler;
 import com.soulteam.soulfrags.blocks.*;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -13,6 +17,8 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -28,6 +34,18 @@ public class SoulItems
 	
 	//blocks
 	public static Block soullantern;
+	
+	//tile entities
+	public static Block tilefreezer;
+	
+	public void registerTiles(FMLPreInitializationEvent event, String MODID)
+	{
+		tilefreezer = new Freezer().setUnlocalizedName(MODID + "_tilefreezer");
+		GameRegistry.registerBlock(tilefreezer, "tilefreezer");
+		GameRegistry.registerTileEntity(TileEntityFreezer.class, "tilefreezer");
+		NetworkRegistry.INSTANCE.registerGuiHandler(SoulFragments.instance, GuiHandler.getInstance());
+		GuiHandler.getInstance().registerGuiHandler(new FreezerGUIHandler(), FreezerGUIHandler.getGuiID());
+	}
 	
 	public void registerItems(FMLInitializationEvent event, String MODID)
 	{
