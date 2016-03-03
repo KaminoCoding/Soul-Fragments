@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ CommuMod - A Minecraft Modification
+  ~ Copyright (c) 2016. noahk (Cyb3rWarri0r8/Endergriefer153/Starwarsman)
+  -->
+
+<config>
+	<modid>soulfrags</modid>
+    <mcversion>1.8</mcversion>
+	<group>com.soulteam.soulfragments</group>
+	<version>0.0.1.5</version>
+	<isDev>true</isDev>
+</config>

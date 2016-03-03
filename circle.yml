@@ -1,0 +1,17 @@
+machine:
+    java:
+        version: oraclejdk8
+
+
+general:
+    artifacts:
+        - "build/libs"
+        
+notify:
+    webhooks:
+        - url: https://webhooks.gitter.im/e/f5fd3306d61b6d851568
+
+#test:
+#  post:
+#    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+#    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

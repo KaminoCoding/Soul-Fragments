@@ -26,7 +26,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBrewingStand;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -39,7 +38,7 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import scala.Array;
 
-public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBox, ISidedInventory
+public class TileEntityFreezer extends TileEntity implements ISidedInventory
 {
 	//---------------------------------------------------------------//
 	//----------------------VARIABLES--------------------------------//
@@ -230,20 +229,30 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		markDirty(); //mark as dirty, so the NBT knows what to save
 		return itemsRemoved; //return the itemstack
 	}
-	
+
+	/**
+	 * Removes a stack from the given slot and returns it.
+	 *
+	 * @param index
+	 */
+	@Override
+	public ItemStack removeStackFromSlot( int index ) {
+		return null;
+	}
+
 	/**
 	 * Returns entire stacks of items in slot used by 
 	 * crafting tables and such blocks that drops everything on closing
 	 * @param index The index of the slot
 	 * @return Returns everything inside the slots
 	**/
-	@Override
+	/*@Override
 	public ItemStack getStackInSlotOnClosing(int index)
 	{
 		ItemStack itemstack = getStackInSlot(index);
 		if(itemstack != null) setInventorySlotContents(index, null);
 		return itemstack;
-	}
+	}*/
 	
 	/** Puts an item stack inside a specific slot **/
 	@Override
@@ -286,8 +295,8 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 	
 	/** Called every tick to update the tileentity
 	* i.e. if the fuel(s) has run out etc. **/
-	@Override
-	public void update()
+	//@Override
+	public void updateContainingBlockInfo()
 	{
 		if(freezingSomething()) //if the freezer is freezing something
 		{
