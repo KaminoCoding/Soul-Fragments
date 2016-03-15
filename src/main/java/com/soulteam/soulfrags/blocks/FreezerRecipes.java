@@ -30,7 +30,7 @@ public class FreezerRecipes
 	private FreezerRecipes()
 	{
 		//Initialize recipes here
-		this.addRecipe(Items.glass_bottle, new ItemStack(SoulItems.coldbottle));
+		//this.addRecipe(Items.glass_bottle, new ItemStack(SoulItems.coldbottle));
 		
 	}
 	
@@ -56,7 +56,7 @@ public class FreezerRecipes
 	
 	public ItemStack recipeReturnStack(ItemStack input)
 	{
-		Iterator iterator = this.freezeList.entrySet().iterator();
+		/*Iterator iterator = this.freezeList.entrySet().iterator();
 		Entry entry;
 		do
 		{
@@ -65,7 +65,8 @@ public class FreezerRecipes
 			entry = (Entry)iterator.next();
 		}
 		while(!compareStacks(input, (ItemStack)entry.getKey()));
-		return (ItemStack)entry.getValue();
+		return (ItemStack)entry.getValue();*/
+		return new ItemStack(SoulItems.coldbottle);
 	}
 	
 	private boolean compareStacks(ItemStack stack1, ItemStack stack2)

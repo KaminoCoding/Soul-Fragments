@@ -40,11 +40,7 @@ public class SoulItems
 	
 	public void registerTiles(FMLPreInitializationEvent event, String MODID)
 	{
-		tilefreezer = new Freezer().setUnlocalizedName(MODID + "_tilefreezer");
-		GameRegistry.registerBlock(tilefreezer, "tilefreezer");
-		GameRegistry.registerTileEntity(TileEntityFreezer.class, "tilefreezer");
-		NetworkRegistry.INSTANCE.registerGuiHandler(SoulFragments.instance, GuiHandler.getInstance());
-		GuiHandler.getInstance().registerGuiHandler(new FreezerGUIHandler(), FreezerGUIHandler.getGuiID());
+		tilefreezer = new Freezer();
 	}
 	
 	public void registerItems(FMLInitializationEvent event, String MODID)
@@ -74,6 +70,8 @@ public class SoulItems
 			
 			//blocks
 			rI.getItemModelMesher().register(Item.getItemFromBlock(soullantern), 0, new ModelResourceLocation(MODID + ":" + ((SoulLantern) soullantern).getName(), "inventory"));
+			rI.getItemModelMesher().register(Item.getItemFromBlock(tilefreezer), 0, new ModelResourceLocation(MODID + ":" + ((Freezer) tilefreezer).getName(), "inventory"));
+			
 		}
 	}
 	

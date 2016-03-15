@@ -1,0 +1,13 @@
+{
+    "parent": "block/cube",
+    "textures":
+    {
+        "up": "soulfragments:blocks/Freezer_Top",
+        "down": "soulfragments:blocks/Freezer_Top",
+        "north": "soulfragments:blocks/Freezer",
+        "south": "soulfragments:blocks/Freezer_South",
+        "east": "soulfragments:blocks/Freezer_Top",
+        "west": "soulfragments:blocks/Freezer_Top",
+        "particle": "soulfragments:blocks/Freezer_Top"
+    }
+}

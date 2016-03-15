@@ -95,7 +95,7 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		}
 	}
 	
-	public boolean freezingSomething() { return freezeTime > 0 && freezeTime < COOK_TIME_COMPLETION; }
+	public boolean freezingSomething() { return freezeTime > 0 && freezeTime <= COOK_TIME_COMPLETION; }
 	
 	public ItemStack getFreezeRecipe(ItemStack input){ return FreezerRecipes.instance().recipeReturnStack(input); }
 	
@@ -116,8 +116,8 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 			}
 			if(item == Items.water_bucket)
 				return 200;
-			return 100;
 		}
+		return 0;
 	}
 	
 	public static int getFuelTime(ItemStack fuel) { return TileEntityFurnace.getItemBurnTime(fuel); }
@@ -127,13 +127,6 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		return getFuelFreezeTime(input) > 0 || getFuelTime(input) > 0;
 	}
 	
-	/** Returns true if item is allowed to go into the slot **/
-	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack)
-	{
-		return index == 3 ? false : (index != 0 ? isItemFuel(stack) : getFreezeRecipe(stack) != null);
-	}
-
 	// returns the number of ticks the given item will burn. Returns 0 if the given item is not a valid fuel
 	public static short getItemBurnTime(ItemStack stack)
 	{
@@ -151,7 +144,8 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 			//Then check if the output slot is null or if the output stack can 
 			//be combined with the items there
 			outputStack = getFreezeRecipe(itemstacks[INPUT_SLOT]);
-			if(outputStack == itemstacks[OUTPUT_SLOT] || itemstacks[OUTPUT_SLOT] == null)
+			//Always check if it is null before checking anything else...
+			if(itemstacks[OUTPUT_SLOT] == null || itemstacks[OUTPUT_SLOT].getItem() == outputStack.getItem())
 				outputSlot = OUTPUT_SLOT;
 		}
 		if(outputSlot == null) return false; //Check if the input is valid
@@ -170,12 +164,83 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		return true;
 	}
 	
+	public boolean burnFuel()
+	{
+		boolean inventoryChanged = false;
+		boolean burningFuel = false; //Flag set true when fuel is burning
+		if(currentFuelBurnTime > 0){ currentFuelBurnTime --; burningFuel = true; }
+		if(currentFuelFreezeTime > 0){ currentFuelFreezeTime --; burningFuel = true; }
+		if(currentFuelBurnTime == 0)
+		{
+			//Check if there's anything in the fuel slot, and check if it's burnable
+			if(itemstacks[FUEL_SLOT] != null && getFuelTime(itemstacks[FUEL_SLOT]) > 0)
+			{
+				//Reset the fuel amount left counter
+				currentFuelBurnTime = initialFuelBurnTime = getFuelTime(itemstacks[FUEL_SLOT]);
+				//Decrease the fuel slot item stack
+				itemstacks[FUEL_SLOT].stackSize --;
+				//Set flag to true
+				burningFuel = true;
+				//Mark the block for an update
+				inventoryChanged = true;
+				//Check if the item stack reached 0, if so, return
+				//the container item. Lava buckets will return an empty bucket
+				//and normal items will return null
+				if(itemstacks[FUEL_SLOT].stackSize == 0)
+					itemstacks[FUEL_SLOT] = itemstacks[FUEL_SLOT].getItem().getContainerItem(itemstacks[FUEL_SLOT]);
+			}
+		}
+		if(currentFuelFreezeTime == 0)
+		{
+			if(itemstacks[FREEZER_SLOT] != null && getFuelFreezeTime(itemstacks[FREEZER_SLOT]) > 0)
+			{
+				currentFuelFreezeTime = initialFuelFreezeTime = getFuelFreezeTime(itemstacks[FREEZER_SLOT]);
+				itemstacks[FREEZER_SLOT].stackSize--;
+				burningFuel = true;
+				inventoryChanged = true;
+				if(itemstacks[FREEZER_SLOT].stackSize == 0)
+					itemstacks[FREEZER_SLOT] = itemstacks[FREEZER_SLOT].getItem().getContainerItem(itemstacks[FREEZER_SLOT]);
+			}
+		}
+		if(inventoryChanged)
+			markDirty();
+		return burningFuel;
+	}
+	
+	/** Called every tick to update the tileentity
+	* i.e. if the fuel(s) has run out etc. **/
+	@Override
+	public void update() //TODO Messy, messy, ugly code
+	{
+		if(freezeObject(false))
+		{
+			if(currentFuelBurnTime == 0 || currentFuelFreezeTime == 0)
+				freezeTime -= 2;
+			if(burnFuel())
+				freezeTime += 1;
+			if(freezeTime < 0) freezeTime = 0;
+			if(freezeTime >= COOK_TIME_COMPLETION)
+			{
+				freezeObject(true);
+				freezeTime = 0;
+			}
+		}
+		else
+			freezeTime = 0;
+	}
+
+	@Override
+	public void clear()
+	{
+		Arrays.fill(itemstacks, null);
+	}
+
 	/** Overridden functions **/
 	/** Get the lang name **/
 	@Override
 	public String getName()
 	{
-		return "container.SoulFragments_Freezer.name";
+		return "container.SoulFragments_tilefreezer.name";
 	}
 		
 	/** Get the human readable "display" name from the lang file **/
@@ -195,6 +260,24 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		return itemstacks.length;
 	}
 	
+	/** Default Minecraft inventory stack limit is 64 **/
+	@Override
+	public int getInventoryStackLimit()
+	{
+		return 64;
+	}
+
+	/** Puts an item stack inside a specific slot **/
+	@Override
+	public void setInventorySlotContents(int index, ItemStack stack)
+	{
+		itemstacks[index] = stack; //set the stack contents first
+		//if the stack exceeds the inventory stack limit
+		if(stack != null && stack.stackSize > getInventoryStackLimit())
+			stack.stackSize = getInventoryStackLimit(); //make it smaller :-)
+		markDirty(); //mark dirty
+	}
+
 	/** Gets the stack of items in a slot **/
 	@Override
 	public ItemStack getStackInSlot(int index)
@@ -245,24 +328,13 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		return itemstack;
 	}
 	
-	/** Puts an item stack inside a specific slot **/
+	/** Returns true if item is allowed to go into the slot **/
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
+	public boolean isItemValidForSlot(int index, ItemStack stack)
 	{
-		itemstacks[index] = stack; //set the stack contents first
-		//if the stack exceeds the inventory stack limit
-		if(stack != null && stack.stackSize > getInventoryStackLimit())
-			stack.stackSize = getInventoryStackLimit(); //make it smaller :-)
-		markDirty(); //mark dirty
+		return index == 3 ? false : (index != 0 ? isItemFuel(stack) : getFreezeRecipe(stack) != null);
 	}
-	
-	/** Default Minecraft inventory stack limit is 64 **/
-	@Override
-	public int getInventoryStackLimit()
-	{
-		return 64;
-	}
-	
+
 	/** Returns true if used by player, and follows this set of criteria
 	* 1) If the tile entity hasn't been replaced
 	* 2) If the player is close enough to the tile entity **/
@@ -279,56 +351,30 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 	}
 
 	@Override
-	public void clear()
-	{
-		Arrays.fill(itemstacks, null);
-	}
-	
-	/** Called every tick to update the tileentity
-	* i.e. if the fuel(s) has run out etc. **/
-	@Override
-	public void update()
-	{
-		if(freezingSomething()) //if the freezer is freezing something
-		{
-			++freezeTime; //increase the freeze time
-			--currentFuelFreezeTime; //decrease the fuel burning/freezing amount
-			--currentFuelBurnTime;
-		}
-		//check if there are anymore fuel, if not
-		if(itemstacks[FUEL_SLOT] == null || itemstacks[FREEZER_SLOT] == null)
-		{   //un-freeze everything at double the speed
-			freezeTime = MathHelper.clamp_int(freezeTime - 2, 0, this.COOK_TIME_COMPLETION);
-		}
-		else if(freezeObject(false))
-		{   
-			//or else, reset the fuel times and consume one piece of fuel
-			if(currentFuelFreezeTime == 0)
-			{
-				currentFuelFreezeTime = initialFuelFreezeTime = getFuelFreezeTime(itemstacks[FREEZER_SLOT]);
-				itemstacks[FREEZER_SLOT].stackSize --;
-				if(itemstacks[INPUT_SLOT].stackSize <= 0)
-					itemstacks[INPUT_SLOT] = null;
-			}
-			if(currentFuelBurnTime == 0)
-			{
-				currentFuelBurnTime = initialFuelBurnTime = getFuelTime(itemstacks[FUEL_SLOT]);
-				itemstacks[FUEL_SLOT].stackSize --;
-				if(itemstacks[FUEL_SLOT].stackSize <= 0)
-					itemstacks[FUEL_SLOT] = null;
-			}
-		}
-		if(freezeTime == this.COOK_TIME_COMPLETION) //check if the item is finished freezing
-		{
-			freezeTime = 0; //reset timer
-			freezeObject(true); //convert the item
-		}
-	}
-	
-	@Override
 	public void readFromNBT(NBTTagCompound compound)
 	{
 		super.readFromNBT(compound); //Needed
+		final byte NBT_TYPE_COMPOUND = 10; //Something here. Apparently its 10...
+		NBTTagList list = compound.getTagList("Slots", NBT_TYPE_COMPOUND);
+		
+		//Empty all slots
+		Arrays.fill(itemstacks, null);
+		for(int i = 0; i < list.tagCount(); i ++)
+		{
+			NBTTagCompound slotData = new NBTTagCompound();
+			byte slotNumber = slotData.getByte("Slot");
+			if(slotNumber >= 0 && slotNumber < this.itemstacks.length)
+				this.itemstacks[slotNumber] = ItemStack.loadItemStackFromNBT(slotData);
+		}
+		
+		currentFuelFreezeTime = compound.getInteger("FuelFreeze");
+		currentFuelBurnTime = compound.getInteger("FuelBurn");
+	}
+	
+	@Override
+	public void writeToNBT(NBTTagCompound compound)
+	{
+		super.writeToNBT(compound);
 		NBTTagList list = new NBTTagList();
 		for(int i = 0; i < this.itemstacks.length; i++)
 		{
@@ -345,27 +391,6 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		compound.setTag("Slots", list);
 		compound.setTag("FuelFreeze", new NBTTagInt(currentFuelFreezeTime));
 		compound.setTag("FuelBurn", new NBTTagInt(currentFuelBurnTime));
-	}
-	
-	@Override
-	public void writeToNBT(NBTTagCompound compound)
-	{
-		super.writeToNBT(compound);
-		final byte NBT_TYPE_COMPOUND = 10; //Something here. Apparently its 10...
-		NBTTagList list = compound.getTagList("Slots", NBT_TYPE_COMPOUND);
-		
-		//Empty all slots
-		Arrays.fill(itemstacks, null);
-		for(int i = 0; i < list.tagCount(); i ++)
-		{
-			NBTTagCompound slotData = new NBTTagCompound();
-			byte slotNumber = slotData.getByte("Slot");
-			if(slotNumber >= 0 && slotNumber < this.itemstacks.length)
-				this.itemstacks[slotNumber] = ItemStack.loadItemStackFromNBT(slotData);
-		}
-		
-		currentFuelFreezeTime = compound.getInteger("FuelFreeze");
-		currentFuelBurnTime = compound.getInteger("FuelBurn");
 	}
 	
 	@Override
