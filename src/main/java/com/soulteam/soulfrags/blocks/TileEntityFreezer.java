@@ -1,25 +1,14 @@
 package com.soulteam.soulfrags.blocks;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-import com.soulteam.soulfrags.GUI.FreezerGUIInventory;
-import com.soulteam.soulfrags.GUI.GuiHandler;
-
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
@@ -27,18 +16,12 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityBrewingStand;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.tileentity.TileEntityLockable;
-import net.minecraft.util.ChatComponentStyle;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.MathHelper;
-import scala.Array;
+import net.minecraft.util.*;
 
-public class TileEntityFreezer extends TileEntity implements ISidedInventory
+import java.util.Arrays;
+
+public class TileEntityFreezer extends TileEntity implements ITickable, ISidedInventory
 {
 	//---------------------------------------------------------------//
 	//----------------------VARIABLES--------------------------------//
@@ -76,7 +59,7 @@ public class TileEntityFreezer extends TileEntity implements ISidedInventory
 	
 	/**
 	 * 
-	 * @return
+	 * @return double
 	 */
 	public double fractionFuelRemaining(boolean isCoolant)
 	{
@@ -464,5 +447,11 @@ public class TileEntityFreezer extends TileEntity implements ISidedInventory
 		else if(stack.getItem() == Items.bucket || isItemFuel(stack)) //disallow fuel to be extracted
 			return false;
 		return false; //Disallow if nothing returns
+	}
+
+
+	@Override
+	public void tick() {
+
 	}
 }

@@ -8,6 +8,6 @@
 	<modid>soulfrags</modid>
     <mcversion>1.8</mcversion>
 	<group>com.soulteam.soulfragments</group>
-	<version>0.0.1.5</version>
+	<version>0.0.1.6</version>
 	<isDev>true</isDev>
 </config>
