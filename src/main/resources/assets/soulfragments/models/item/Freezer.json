@@ -1,5 +1,5 @@
 {
-    "parent": "soulfragments:block/SoulLantern",
+    "parent": "soulfragments:block/Freezer",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],

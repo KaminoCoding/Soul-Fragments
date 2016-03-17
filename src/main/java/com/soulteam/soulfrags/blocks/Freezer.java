@@ -23,11 +23,16 @@ public class Freezer extends BlockContainer
 {
 	//This is the actual block class for the freezer
 	
-	private final String name = "tilefreezer";
+	private final String name = "Freezer";
 	
 	public Freezer()
 	{
 		super(Material.rock);
+		GameRegistry.registerBlock(this, name);
+		GameRegistry.registerTileEntity(TileEntityFreezer.class, name);
+		NetworkRegistry.INSTANCE.registerGuiHandler(SoulFragments.instance, GuiHandler.getInstance());
+		GuiHandler.getInstance().registerGuiHandler(new FreezerGUIHandler(), FreezerGUIHandler.getGuiID());
+		setUnlocalizedName(SoulFragments.MODID + "_" + name);
 		setCreativeTab(CreativeTabs.tabMisc);
 		setLightOpacity(5);
 	}
@@ -61,6 +66,11 @@ public class Freezer extends BlockContainer
 			InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory)tEntity);
 		super.breakBlock(worldIn, pos, state); //removes the block
 	}
+
+	public String getName()
+	{
+		return name;
+	}
 	
-	//Everything below is for block rendering purposes
+	//Everything below are for block rendering purposes
 }
