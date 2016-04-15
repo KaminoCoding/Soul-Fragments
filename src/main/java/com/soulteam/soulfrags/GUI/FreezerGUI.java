@@ -53,10 +53,14 @@ public class FreezerGUI extends GuiContainer
 		double freezeRemaining = tileEntity.fractionFuelRemaining(true);
 		double fuelRemaining = tileEntity.fractionFuelRemaining(false);
 		
+		int yOffset1 = (int)((1.0 - fuelRemaining) * 14);
+		int yOffset2 = (int)((1.0 - freezeRemaining) * 14);
+		
 		//Draw the progress bar, the freeze icon and the fuel fire icon
 		drawTexturedModalRect(guiLeft + COOK_BAR_X, guiTop + COOK_BAR_Y, COOK_BAR_ICON_U, COOK_BAR_ICON_V, (int)(freezeProgress * COOK_BAR_WIDTH), COOK_BAR_HEIGHT);
-		drawTexturedModalRect(guiLeft + FREEZE_FLAME_X, guiTop + FREEZE_FLAME_Y, FREEZE_ICON_U, FREEZE_ICON_V, 14, (int)freezeRemaining * 14);
-		drawTexturedModalRect(guiLeft + FLAME_X, guiTop + FLAME_Y, FLAME_ICON_U, FLAME_ICON_V, 14, (int)fuelRemaining * 14);
+		
+		drawTexturedModalRect(guiLeft + FREEZE_FLAME_X, guiTop + FREEZE_FLAME_Y + yOffset2, FREEZE_ICON_U, FREEZE_ICON_V + yOffset2, 14, 14 - yOffset2);
+		drawTexturedModalRect(guiLeft + FLAME_X, guiTop + FLAME_Y + yOffset1, FLAME_ICON_U, FLAME_ICON_V + yOffset1, 14, 14 - yOffset1);
 	}
 
 }

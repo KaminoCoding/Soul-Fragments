@@ -40,8 +40,8 @@ public class FreezerGUIInventory extends Container
 	//These are the index of the slots WITHIN each component
 	//So, the index of the (playerInv) inventory slots are 0-35, and the index of the Freezer slots will be 0-3
 	private final int INPUT_NUMBER = 0;
-	private final int FUEL_NUMBER = INPUT_NUMBER + 1;
-	private final int FREEZER_NUMBER = FUEL_NUMBER + 1;
+	private final int FREEZER_NUMBER = INPUT_NUMBER + 1;
+	private final int FUEL_NUMBER = FREEZER_NUMBER + 1;
 	private final int OUTPUT_NUMBER = FREEZER_NUMBER + 1;
 	
 	public FreezerGUIInventory(InventoryPlayer invPlayer, TileEntityFreezer tileEntityFreezer)
@@ -75,8 +75,8 @@ public class FreezerGUIInventory extends Container
 		// Now add the fuel, i/o and freezer slots
 		// Coordinates retrieved from GIMP :p
 		addSlotToContainer(new FreezableInput(tilefreezer, INPUT_NUMBER, 26, 23));
-		addSlotToContainer(new SlotFuel(tilefreezer, FUEL_NUMBER, 26, 59));
-		addSlotToContainer(new SlotFreezer(tilefreezer, FREEZER_NUMBER, 80, 59));
+		addSlotToContainer(new SlotFreezer(tilefreezer, FREEZER_NUMBER, 26, 59));
+		addSlotToContainer(new SlotFuel(tilefreezer, FUEL_NUMBER, 80, 59));
 		addSlotToContainer(new SlotOutput(tilefreezer, OUTPUT_NUMBER, 134, 41));
 	}
 	

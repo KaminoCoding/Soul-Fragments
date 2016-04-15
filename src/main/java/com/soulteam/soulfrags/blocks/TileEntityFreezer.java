@@ -48,8 +48,8 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 	public static final int TOTAL_SLOTS = 4; //how many slots there are in the container
 	private ItemStack[] itemstacks = new ItemStack[TOTAL_SLOTS]; //inventory array. each array slot contains an itemstack
 	public static final int INPUT_SLOT = 0;
-	public static final int FUEL_SLOT = 1;
-	public static final int FREEZER_SLOT = 2;
+	public static final int FUEL_SLOT = 2;
+	public static final int FREEZER_SLOT = 1;
 	public static final int OUTPUT_SLOT = 3;
 	
 	private static int SLOTS_BOTTOM[] = new int[] {3};
@@ -167,9 +167,12 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 	public boolean burnFuel()
 	{
 		boolean inventoryChanged = false;
-		boolean burningFuel = false; //Flag set true when fuel is burning
-		if(currentFuelBurnTime > 0){ currentFuelBurnTime --; burningFuel = true; }
-		if(currentFuelFreezeTime > 0){ currentFuelFreezeTime --; burningFuel = true; }
+		//set 3 flags
+		//TODO: Might not be the CLEANEST way... but... whatever
+		boolean flag1 = false, flag2 = false;
+		if(currentFuelBurnTime > 0){ currentFuelBurnTime --; flag1 = true; }
+		if(currentFuelFreezeTime > 0){ currentFuelFreezeTime --; flag2 = true; }
+		
 		if(currentFuelBurnTime == 0)
 		{
 			//Check if there's anything in the fuel slot, and check if it's burnable
@@ -179,8 +182,7 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 				currentFuelBurnTime = initialFuelBurnTime = getFuelTime(itemstacks[FUEL_SLOT]);
 				//Decrease the fuel slot item stack
 				itemstacks[FUEL_SLOT].stackSize --;
-				//Set flag to true
-				burningFuel = true;
+				flag1 = true; //Set 1st flag
 				//Mark the block for an update
 				inventoryChanged = true;
 				//Check if the item stack reached 0, if so, return
@@ -190,13 +192,14 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 					itemstacks[FUEL_SLOT] = itemstacks[FUEL_SLOT].getItem().getContainerItem(itemstacks[FUEL_SLOT]);
 			}
 		}
+		
 		if(currentFuelFreezeTime == 0)
 		{
 			if(itemstacks[FREEZER_SLOT] != null && getFuelFreezeTime(itemstacks[FREEZER_SLOT]) > 0)
 			{
 				currentFuelFreezeTime = initialFuelFreezeTime = getFuelFreezeTime(itemstacks[FREEZER_SLOT]);
 				itemstacks[FREEZER_SLOT].stackSize--;
-				burningFuel = true;
+				flag2 = true; //Set 2nd flag
 				inventoryChanged = true;
 				if(itemstacks[FREEZER_SLOT].stackSize == 0)
 					itemstacks[FREEZER_SLOT] = itemstacks[FREEZER_SLOT].getItem().getContainerItem(itemstacks[FREEZER_SLOT]);
@@ -204,20 +207,26 @@ public class TileEntityFreezer extends TileEntity implements IUpdatePlayerListBo
 		}
 		if(inventoryChanged)
 			markDirty();
-		return burningFuel;
+		//We want the start the freezing process only when both fuels are present
+		if(flag1 == true && flag2 == true)
+			return true;
+		return false;
 	}
 	
-	/** Called every tick to update the tileentity
+	/** Called every tick to update the tile entity
 	* i.e. if the fuel(s) has run out etc. **/
 	@Override
-	public void update() //TODO Messy, messy, ugly code
+	public void update()
 	{
+		//Check if items are smeltable
 		if(freezeObject(false))
 		{
-			if(currentFuelBurnTime == 0 || currentFuelFreezeTime == 0)
-				freezeTime -= 2;
-			if(burnFuel())
+			if(burnFuel()) //If both fuel are present, start smelting process
 				freezeTime += 1;
+			else
+			{
+				freezeTime -= 2;
+			}
 			if(freezeTime < 0) freezeTime = 0;
 			if(freezeTime >= COOK_TIME_COMPLETION)
 			{
