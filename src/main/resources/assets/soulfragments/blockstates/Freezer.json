@@ -1,5 +1,8 @@
 {
     "variants": {
-        "normal": { "model": "soulfragments:Freezer" }
+        "facing=north": { "model": "soulfragments:Freezer" }, 
+		"facing=west": { "model": "soulfragments:Freezer", "y": 270 }, 
+		"facing=east": { "model": "soulfragments:Freezer", "y": 90 }, 
+		"facing=south": { "model": "soulfragments:Freezer", "y": 180 }
     }
 }
