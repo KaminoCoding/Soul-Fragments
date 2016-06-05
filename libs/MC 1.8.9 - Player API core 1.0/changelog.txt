@@ -1,0 +1,2 @@
+== Player API core 1.0 ==
++ created Player API core for Minecraft 1.8.9

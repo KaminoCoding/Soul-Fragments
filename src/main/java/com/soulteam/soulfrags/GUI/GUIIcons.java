@@ -53,7 +53,7 @@ public class GUIIcons extends Gui
 		ExtendedPlayer extPlyr = ExtendedPlayer.get(this.mc.thePlayer);
 		if(event.isCancelable()||event.type != ElementType.EXPERIENCE)
 			return;
-		int scale = mc.gameSettings.guiScale; //Get the scale settings, 1 = Smallest, 4 = Largest, 2 to 3 = everything else
+		int scale = mc.gameSettings.guiScale + 1; //Get the scale settings, 1 = Smallest, 4 = Largest, 2 to 3 = everything else
 		int xPos = 5; //X, Y coordinates on screen
 		int yPos = 255 / scale; //Make sure the label don't go off screen when on different GUI scales :p
 		GL11.glColor4f(1F, 1F, 1F, 1F); //Drawing settings stuff
